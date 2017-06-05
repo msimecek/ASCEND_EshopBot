@@ -2,7 +2,7 @@
 
 abcd
 
-## Use-case
+# Problem statement
 
 This chatbot takes part in the Retail Store of the Future installation. First shown at the DOTS 2017 conference in Prague, it showcases how an electronic conversational interface can complement both brick&mortar store and an e-shop.
 
@@ -15,23 +15,33 @@ The chatbot is integrated into a mocked up e-shop website, using Microsoft Bot F
 3. *Answering general questions related to shopping in this store.*
 4. *Filing complaints in case the user was not satisfied with something.*
 
-All of this can be achieved via the website or in person, but a chatbot allows to complete those tasks more efficiently.
+All of this could be achieved via website or in person, but chatbot allows to complete those tasks more efficiently.
 
 > It's important to emphasize that the bot **cannot browse goods and search the e-shop**. This is deliberate - we believe that the existing website serves this purpose better and chatbot wouldn't bring much value to it.
 
-## Technology
+# Key Technologies
 
-This bot was built using [Bot Builder C# SDK](https://github.com/Microsoft/BotBuilder). 
+* [Bot Builder C# SDK](https://github.com/Microsoft/BotBuilder)
+* [Microsoft Bot Framework](https://dev.botframework.com/) (optimized for Web Chat)
+* [QnA Maker service](https://qnamaker.ai/)
+* [Bing Maps API](https://msdn.microsoft.com/en-us/library/ff701702.aspx) 
+* [Mapy.cz API](http://api.mapy.cz/)
+* [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/)
+* [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/)
 
-It is connected to [Microsoft Bot Framework](https://dev.botframework.com/) and optimized for Web Chat.
+# Customer Profile
 
-It utilizes the [QnA Maker service](https://qnamaker.ai/) to provide answers to general questions.
+[Adastra](https://www.adastra.cz) is aninternational consulting company with over 20 years of experience in providingcomprehensive software solutions and services tailored to the specific needs ofbusinesses. Adastra has built and continue to develop a dominant position inthe field of Information Management in four key competencies – DataWarehousing, Business Intelligence, including Mobile BI, Master Data Managementand Enterprise Application Integration. Among clients in the Czech Republic areAhold, Cetelem, ČSOB, ČSOB Pojišťovna, Equa bank, GE Money bank, PPF, ŠkodaAuto, Tipsport, Telefonica O2, Vodafone. The European activities of AdastraGroup are managed from our headquarters in Prague and our branches in London,Frankfurt, Bratislava, Sofia and Moscow. Adastra offices for North America arein Toronto and New York.
 
-It uses [Bing Maps API](https://msdn.microsoft.com/en-us/library/ff701702.aspx) to generate map with store location and [Mapy.cz API](http://api.mapy.cz/) to geocode address to GPS location.
+[Awards](http://www.adastra.cz/en/about-adastra/awards): Canada´s 50 Best Managed Companies, TOP 100 2014, IT Project ofthe year – 2012, European Business Award, Via Bona 2012, ISO 9001:2009,ISO 27001:2005
 
-It is deployed to [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/).
+25 Solutions: [http://www.adastra.cz/en/business-solutions](https://na01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.adastra.cz%2Fen%2Fbusiness-solutions&data=02%7C01%7CMartin.Simecek%40microsoft.com%7C9bc10cbc7d1f40ed015108d48af60ea3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636286236792607439&sdata=r9L39fCoXVNl1jGiMXyMfsJRTqcB5WQyJHZGBhX3Aa4%3D&reserved=0) 
 
-It is monitored by [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/).
+Technology: [http://www.adastra.cz/en/technology](https://na01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.adastra.cz%2Fen%2Ftechnology&data=02%7C01%7CMartin.Simecek%40microsoft.com%7C9bc10cbc7d1f40ed015108d48af60ea3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636286236792607439&sdata=UbnMOBjfZYryX4lJrwPxjEWjjjhm4AcZNKNcSshon9A%3D&reserved=0) 
+
+# Solution
+
+In this writeup we will not be going through the process of creating a bot using Microsoft Bot Framework, but instead focus on interesting parts of this particular solution.
 
 ## Conversation structure
 
