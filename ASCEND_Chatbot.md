@@ -145,7 +145,13 @@ protected override async Task PostAsync(IActivity item, string state, Cancellati
 }
 ```
 
+### Confusion
 
+What we found immediately after first rounds of user testing was that navigation commands have to be clearly visible and it's not enough to just state in the message "...or type Back to return.", since users are not very good in spotting these hints. Therefore we added the "<- Back" button to such messages.
+
+![back-command](Images/back-command.png)
+
+What also turned out to be confusing is that main menu buttons are always available in the chat history and users tend to click on them when they feel lost or just want to try different area without properly leaving the current one. On Facebook Messenger this can be solved by using quick actions (they dissapear after being selected) while on webchat the menu would have to be implemented as a global action. We didn't go this way in the project.
 
 ## QnA Service
 
