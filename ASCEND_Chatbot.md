@@ -1,12 +1,12 @@
 # Retail chatbot
 
-abcd
+TBD
 
 # Problem statement
 
 This chatbot takes part in the Retail Store of the Future installation. First shown at the DOTS 2017 conference in Prague, it showcases how an electronic conversational interface can complement both brick&mortar store and an e-shop.
 
-![Bot installation](Images/bot-installed.png)
+![Bot installation](images/Adastra/bot-installed.png)
 
 The chatbot is integrated into a mocked up e-shop website, using Microsoft Bot Framework's embedded Web Chat control, and serves four specific purposes:
 
@@ -31,7 +31,7 @@ All of this could be achieved via website or in person, but chatbot allows to co
 
 # Customer Profile
 
-[Adastra](https://www.adastra.cz) is aninternational consulting company with over 20 years of experience in providingcomprehensive software solutions and services tailored to the specific needs ofbusinesses. Adastra has built and continue to develop a dominant position inthe field of Information Management in four key competencies – DataWarehousing, Business Intelligence, including Mobile BI, Master Data Managementand Enterprise Application Integration. Among clients in the Czech Republic areAhold, Cetelem, ČSOB, ČSOB Pojišťovna, Equa bank, GE Money bank, PPF, ŠkodaAuto, Tipsport, Telefonica O2, Vodafone. The European activities of AdastraGroup are managed from our headquarters in Prague and our branches in London,Frankfurt, Bratislava, Sofia and Moscow. Adastra offices for North America arein Toronto and New York.
+[Adastra](https://www.adastra.cz) is an international consulting company with over 20 years of experience in providing comprehensive software solutions and services tailored to the specific needs of businesses. Adastra has built and continue to develop a dominant position in the field of Information Management in four key competencies – Data Warehousing, Business Intelligence, including Mobile BI, Master Data Managementand Enterprise Application Integration. Among clients in the Czech Republic areAhold, Cetelem, ČSOB, ČSOB Pojišťovna, Equa bank, GE Money bank, PPF, ŠkodaAuto, Tipsport, Telefonica O2, Vodafone. The European activities of AdastraGroup are managed from our headquarters in Prague and our branches in London,Frankfurt, Bratislava, Sofia and Moscow. Adastra offices for North America arein Toronto and New York.
 
 [Awards](http://www.adastra.cz/en/about-adastra/awards): Canada´s 50 Best Managed Companies, TOP 100 2014, IT Project ofthe year – 2012, European Business Award, Via Bona 2012, ISO 9001:2009,ISO 27001:2005
 
@@ -47,15 +47,15 @@ In this writeup we will not be going through the process of creating a bot using
 
 Overall, the conversation structure is designed to lead the user without much typing or guessing what to do next. It begins with a menu with four buttons, each of them navigating to one of the areas, represented by separate Dialogs.
 
-![Main Menu](Images/main-menu.png)
+![Main Menu](images/Adastra/main-menu.png)
 
 After picking an option, the user is routed to appropriate sub-dialog and the conversation continues. This picture contains the whole flow:
 
-![Big Picture](Images/bot-big-picture.png)
+![Big Picture](images/Adastra/bot-big-picture.png)
 
 In code, each area exists as an instance of `IDialog`.
 
-![bot-structure](Images/bot-structure.png)
+![bot-structure](images/Adastra/bot-structure.png)
 
 There's nothing too special about the routing. It runs inside a **PromptDialog**, repeating four options until the user picks one, then moving control to a corresponding Dialog.
 
@@ -149,7 +149,7 @@ protected override async Task PostAsync(IActivity item, string state, Cancellati
 
 What we found immediately after first rounds of user testing was that navigation commands have to be clearly visible and it's not enough to just state in the message "...or type Back to return.", since users are not very good in spotting these hints. Therefore we added the "<- Back" button to such messages.
 
-![back-command](Images/back-command.png)
+![back-command](images/Adastra/back-command.png)
 
 What also turned out to be confusing is that main menu buttons are always available in the chat history and users tend to click on them when they feel lost or just want to try different area without properly leaving the current one. On Facebook Messenger this can be solved by using quick actions (they dissapear after being selected) while on webchat the menu would have to be implemented as a global action. We didn't go this way in the project.
 
@@ -159,15 +159,15 @@ To demonstrate how a chatbot can answer common questions we integrated this one 
 
 The QnA parser is not perfect, so it required some cleanup. It can be done using the GUI editor, so it turned out to be a good practice to return to it during testing a adjust responses.
 
-![QnA Cleanup](Images/qna-cleanup.png)
+![QnA Cleanup](images/Adastra/qna-cleanup.png)
 
 Then we added a few generic questions for which the bot doesn't actually have an answer, but at least responds in a meaningful way.
 
-![QnA General Questions](Images/qna-general-questions.png)
+![QnA General Questions](images/Adastra/qna-general-questions.png)
 
 Finally, we **Saved and retrained** the model and **Published** it.
 
-![QnA Save Publish](Images/qna-save-publish.png)
+![QnA Save Publish](images/Adastra/qna-save-publish.png)
 
 The portal then generated all information necessary to call the API from a chatbot:
 
@@ -305,9 +305,9 @@ await context.PostWithQuickRepliesAsync(
 ...
 ```
 
-![Extension Typing](Images/extension-typing.png)
+![Extension Typing](images/Adastra/extension-typing.png)
 
-![extension-back](Images/extension-back.png)
+![extension-back](images/Adastra/extension-back.png)
 
 ## Website Integration
 
@@ -334,11 +334,11 @@ So instead of an `<iframe>`, we put this piece of code to the website:
 
 It is important to notice that it's not using the Web Chat channel. It runs on **Direct Line** instead. To get the Direct Line secret we registered our bot at [Bot Framework portal](https://dev.botframework.com) and configured the **Direct Line channel**.
 
-![DirectLine Select](Images/directline-select.png)
+![DirectLine Select](images/Adastra/directline-select.png)
 
 Then added new site (called *dotsdemosite* in our case) and copied the first **Secret key**.
 
-![DirectLine Config](Images/directline-config.png)
+![DirectLine Config](images/Adastra/directline-config.png)
 
 To make the bot fit our demo site better, we also provided custom CSS values. Following code goes to the page's HTML `<head>` element.
 
@@ -367,25 +367,25 @@ To make the bot fit our demo site better, we also provided custom CSS values. Fo
 
 First we set the header color to match our branding:
 
-![WebChat Header](Images/webchat-headers.png)
+![WebChat Header](images/Adastra/webchat-headers.png)
 
 Then fixed the way main menu shows up:
 
-![webchat-menus](Images/webchat-menus.png)
+![webchat-menus](images/Adastra/webchat-menus.png)
 
 And also some of the cards:
 
-![webchat-maps](Images/webchat-maps.png)
+![webchat-maps](images/Adastra/webchat-maps.png)
 
 ## Application Insights Telemetry
 
 Bot Framework portal provides nice telemetry overview when connected to Azure [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/) by filling the **Analytics** part in bot's **Settings**.
 
-![analytics-1](Images/analytics-1.png)
+![analytics-1](images/Adastra/analytics-1.png)
 
-![analytics-2](Images/analytics-2.png)
+![analytics-2](images/Adastra/analytics-2.png)
 
-![analytics-3](Images/analytics-3.png)
+![analytics-3](images/Adastra/analytics-3.png)
 
 To get even more information and be able to analyze what messages users were sending to the bot and how far in the conversation structure they've got, there are also custom events being sent to Application Insights.
 
@@ -410,5 +410,8 @@ public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 
 Then we can monitor conversations at the Application Insights portal:
 
-![application-insights](Images/application-insights.png)
+![application-insights](images/Adastra/application-insights.png)
 
+## Power BI
+
+TBD
