@@ -1,33 +1,6 @@
 # Retail chatbot
 
-TBD
-
-# Problem statement
-
-This chatbot takes part in the Retail Store of the Future installation. First shown at the DOTS 2017 conference in Prague, it showcases how an electronic conversational interface can complement both brick&mortar store and an e-shop.
-
-![Bot installation](images/Adastra/bot-installed.png)
-
-The chatbot is integrated into a mocked up e-shop website, using Microsoft Bot Framework's embedded Web Chat control, and serves four specific purposes:
-
-1. *Finding the nearest Store (to user's location).*
-2. *Checking user's order's status.*
-3. *Answering general questions related to shopping in this store.*
-4. *Filing complaints in case the user was not satisfied with something.*
-
-All of this could be achieved via website or in person, but chatbot allows to complete those tasks more efficiently.
-
-> It's important to emphasize that the bot **cannot browse goods and search the e-shop**. This is deliberate - we believe that the existing website serves this purpose better and chatbot wouldn't bring much value to it.
-
-# Key Technologies
-
-* [Bot Builder C# SDK](https://github.com/Microsoft/BotBuilder)
-* [Microsoft Bot Framework](https://dev.botframework.com/) (optimized for Web Chat)
-* [QnA Maker service](https://qnamaker.ai/)
-* [Bing Maps API](https://msdn.microsoft.com/en-us/library/ff701702.aspx) 
-* [Mapy.cz API](http://api.mapy.cz/)
-* [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/)
-* [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/)
+We partnered with Adastra to bring to life an end-to-end smart retail store scenario, powered by Microsoft technology. One piece of this solution was a chat bot with the purpose of showcasing how its conversational interface could help retailers engage their customers in a different and innovative way.
 
 # Customer Profile
 
@@ -38,6 +11,39 @@ All of this could be achieved via website or in person, but chatbot allows to co
 25 Solutions: [http://www.adastra.cz/en/business-solutions](https://na01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.adastra.cz%2Fen%2Fbusiness-solutions&data=02%7C01%7CMartin.Simecek%40microsoft.com%7C9bc10cbc7d1f40ed015108d48af60ea3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636286236792607439&sdata=r9L39fCoXVNl1jGiMXyMfsJRTqcB5WQyJHZGBhX3Aa4%3D&reserved=0) 
 
 Technology: [http://www.adastra.cz/en/technology](https://na01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.adastra.cz%2Fen%2Ftechnology&data=02%7C01%7CMartin.Simecek%40microsoft.com%7C9bc10cbc7d1f40ed015108d48af60ea3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636286236792607439&sdata=UbnMOBjfZYryX4lJrwPxjEWjjjhm4AcZNKNcSshon9A%3D&reserved=0) 
+
+# Problem statement
+
+This chatbot takes part in the Retail Store of the Future installation. First shown at the DOTS 2017 conference in Prague, it showcased how an electronic conversational interface could complement both brick&mortar store and an e-shop.
+
+![Bot installation](images/Adastra/bot-installed.png)
+
+The chatbot was integrated into a [mocked up e-shop website](http://dots-bot.azurewebsites.net/Site/index.html), using Microsoft Bot Framework's embedded Web Chat control, and served four specific purposes:
+
+1. *Finding the nearest Store (to user's location).*
+2. *Checking user's order's status.*
+3. *Answering general questions related to shopping in this store.*
+4. *Filing complaints in case the user was not satisfied with something.*
+
+All of this could be achieved via website or in person, but chatbot allowed to complete those tasks more efficiently.
+
+> It's important to emphasize that the bot **cannot browse goods and search the e-shop**. This is deliberate - we believe that the existing website serves this purpose better and chatbot wouldn't bring much value to it.
+
+# Core Team
+
+* Martin Šimeček - Technical Evangelist, Microsoft
+* Robert Havránek - PMM, Microsoft
+* Martin Záruba - Developer, Adastra
+
+# Key Technologies
+
+* [Bot Builder C# SDK](https://github.com/Microsoft/BotBuilder)
+* [Microsoft Bot Framework](https://dev.botframework.com/) (optimized for Web Chat)
+* [QnA Maker service](https://qnamaker.ai/)
+* [Bing Maps API](https://msdn.microsoft.com/en-us/library/ff701702.aspx) 
+* [Mapy.cz API](http://api.mapy.cz/)
+* [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/)
+* [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/)
 
 # Solution
 
@@ -414,4 +420,54 @@ Then we can monitor conversations at the Application Insights portal:
 
 ## Power BI
 
-TBD
+Application Insights is a great analytics resource for developers, but business decision makers need something different. That's why we included outputs from the chatbot on a Power BI report, which consolidates every piece of information coming from the store.
+
+![bot-powerbi](images/Adastra/bot-powerbi.png)
+
+There were two integration points in the code: after a **message is received** and after a **new incident is created**. The whole solution was using Azure IoT Hub and Stream Analytics to process data points from the installation and chatbot was no different:
+
+```c#
+IotHubService.Instance.SendTelemetryAsync(new TelemetryModel());
+```
+
+```c#
+public class TelemetryModel
+{
+    public string HostName { get; set; }
+    public string ApplicationName { get; set; }
+    public DateTime SentTime { get; set; }
+    [JsonConverter(typeof(StringEnumConverter), true)] // as string and as camel-case
+    public TelemetryType Type { get; set; }
+
+    public TelemetryModel(TelemetryType type = TelemetryType.Message)
+    {
+        HostName = "dotsbot.azurewebsites.net";
+        ApplicationName = "BotGenerator";
+        Type = type;
+    }
+}
+```
+
+We registered it as a regular device in Azure IoT Hub and sent telemetry as messages.
+
+```c#
+public async Task SendTelemetryAsync(TelemetryModel data)
+{
+    data.SentTime = DateTime.Now;
+    var connString = ConfigurationManager.ConnectionStrings["IotHub"].ConnectionString;
+
+    try
+    {
+        using (DeviceClient deviceClient = DeviceClient.CreateFromConnectionString(connString, TransportType.Http1))
+        {
+            string telemetryData = JsonConvert.SerializeObject(data);
+            await deviceClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(telemetryData)));
+        }
+    }
+    catch (Exception ex)
+    {
+        // logging
+    }
+}
+```
+
