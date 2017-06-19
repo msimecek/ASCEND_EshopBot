@@ -466,8 +466,7 @@ public async Task SendTelemetryAsync(TelemetryModel data)
     }
     catch (Exception ex)
     {
-        // logging
+        // ... logging
     }
 }
 ```
-
