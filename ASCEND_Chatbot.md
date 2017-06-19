@@ -1,6 +1,20 @@
-# Retail chatbot
-
 We partnered with Adastra to bring to life an end-to-end smart retail store scenario, powered by Microsoft technology. One piece of this solution was a chat bot with the purpose of showcasing how its conversational interface could help retailers engage their customers in a different and innovative way.
+
+# Key Technologies
+
+* [Bot Builder C# SDK](https://github.com/Microsoft/BotBuilder)
+* [Microsoft Bot Framework](https://dev.botframework.com/) (optimized for Web Chat)
+* [QnA Maker service](https://qnamaker.ai/)
+* [Bing Maps API](https://msdn.microsoft.com/en-us/library/ff701702.aspx) 
+* [Mapy.cz API](http://api.mapy.cz/)
+* [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/)
+* [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/)
+
+# Core Team
+
+* Martin Šimeček - Technical Evangelist, Microsoft
+* Robert Havránek - PMM, Microsoft
+* Martin Záruba - Developer, Adastra
 
 # Customer Profile
 
@@ -8,13 +22,15 @@ We partnered with Adastra to bring to life an end-to-end smart retail store scen
 
 [Awards](http://www.adastra.cz/en/about-adastra/awards): Canada´s 50 Best Managed Companies, TOP 100 2014, IT Project ofthe year – 2012, European Business Award, Via Bona 2012, ISO 9001:2009,ISO 27001:2005
 
-25 Solutions: [http://www.adastra.cz/en/business-solutions](https://na01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.adastra.cz%2Fen%2Fbusiness-solutions&data=02%7C01%7CMartin.Simecek%40microsoft.com%7C9bc10cbc7d1f40ed015108d48af60ea3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636286236792607439&sdata=r9L39fCoXVNl1jGiMXyMfsJRTqcB5WQyJHZGBhX3Aa4%3D&reserved=0) 
+25 Solutions: [http://www.adastra.cz/en/business-solutions](http://www.adastra.cz/en/business-solutions) 
 
-Technology: [http://www.adastra.cz/en/technology](https://na01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.adastra.cz%2Fen%2Ftechnology&data=02%7C01%7CMartin.Simecek%40microsoft.com%7C9bc10cbc7d1f40ed015108d48af60ea3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636286236792607439&sdata=UbnMOBjfZYryX4lJrwPxjEWjjjhm4AcZNKNcSshon9A%3D&reserved=0) 
+Technology: [http://www.adastra.cz/en/technology](http://www.adastra.cz/en/technology) 
 
 # Problem statement
 
-This chatbot takes part in the Retail Store of the Future installation. First shown at the DOTS 2017 conference in Prague, it showcased how an electronic conversational interface could complement both brick&mortar store and an e-shop.
+Consumer brands and retail companies strive to reach their customers (both current and new) in a changing world where traditional marketing channels don't work as efficiently as they used to. They begin to understand the power of new channels - social media and text-based chat applications. An emerging trend in this area are conversational agents (aka chatbots), which are able to not only entertain customers, but also provide valuable information and shortcuts through everything the shop has to offer. When used as a first-line support, they can reduce the number of support tickets and free some capacity of people solving customers' problems.
+
+The chatbot we have implemented takes part in the Retail Store of the Future installation. First shown at the DOTS 2017 conference in Prague, it showcased how an electronic conversational interface could complement both brick&mortar store and an e-shop.
 
 ![Bot installation](images/Adastra/bot-installed.png)
 
@@ -29,27 +45,13 @@ All of this could be achieved via website or in person, but chatbot allowed to c
 
 > It's important to emphasize that the bot **cannot browse goods and search the e-shop**. This is deliberate - we believe that the existing website serves this purpose better and chatbot wouldn't bring much value to it.
 
-# Core Team
-
-* Martin Šimeček - Technical Evangelist, Microsoft
-* Robert Havránek - PMM, Microsoft
-* Martin Záruba - Developer, Adastra
-
-# Key Technologies
-
-* [Bot Builder C# SDK](https://github.com/Microsoft/BotBuilder)
-* [Microsoft Bot Framework](https://dev.botframework.com/) (optimized for Web Chat)
-* [QnA Maker service](https://qnamaker.ai/)
-* [Bing Maps API](https://msdn.microsoft.com/en-us/library/ff701702.aspx) 
-* [Mapy.cz API](http://api.mapy.cz/)
-* [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/)
-* [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/)
-
-# Solution
+# Solution overview
 
 In this writeup we will not be going through the process of creating a bot using Microsoft Bot Framework, but instead focus on interesting parts of this particular solution.
 
-## Conversation structure
+The application and its dependencies is summarized on this diagram:
+
+![](images/Adastra/solution-architecture.png)
 
 Overall, the conversation structure is designed to lead the user without much typing or guessing what to do next. It begins with a menu with four buttons, each of them navigating to one of the areas, represented by separate Dialogs.
 
@@ -58,6 +60,8 @@ Overall, the conversation structure is designed to lead the user without much ty
 After picking an option, the user is routed to appropriate sub-dialog and the conversation continues. This picture contains the whole flow:
 
 ![Big Picture](images/Adastra/bot-big-picture.png)
+
+# Technical Delivery
 
 In code, each area exists as an instance of `IDialog`.
 
@@ -151,7 +155,7 @@ protected override async Task PostAsync(IActivity item, string state, Cancellati
 }
 ```
 
-### Confusion
+### User Confusion
 
 What we found immediately after first rounds of user testing was that navigation commands have to be clearly visible and it's not enough to just state in the message "...or type Back to return.", since users are not very good in spotting these hints. Therefore we added the "<- Back" button to such messages.
 
@@ -418,13 +422,25 @@ Then we can monitor conversations at the Application Insights portal:
 
 ![application-insights](images/Adastra/application-insights.png)
 
+To get message texts, we use this query:
+
+```sql
+union customEvents,pageViews
+| where timestamp > ago(3d)
+| where (name == "Message") 
+| top 100 by timestamp desc
+| project timestamp, name, customDimensions
+```
+
+It's limited by both age (less than 3 days) and number (top 100).
+
 ## Power BI
 
-Application Insights is a great analytics resource for developers, but business decision makers need something different. That's why we included outputs from the chatbot on a Power BI report, which consolidates every piece of information coming from the store.
+Application Insights is a great analytics resource for developers, but business decision makers need something different. That's why we included outputs from the chatbot on a [Power BI report](https://powerbi.microsoft.com/en-us/), which consolidates every piece of information coming from the store.
 
 ![bot-powerbi](images/Adastra/bot-powerbi.png)
 
-There were two integration points in the code: after a **message is received** and after a **new incident is created**. The whole solution was using Azure IoT Hub and Stream Analytics to process data points from the installation and chatbot was no different:
+There were two integration points in the code: after a **message is received** and after a **new incident is created**. The whole solution was using [Azure IoT Hub](https://azure.microsoft.com/en-us/services/iot-hub/) and [Stream Analytics](https://azure.microsoft.com/en-us/services/iot-hub/) to process data points from the installation and chatbot was no different:
 
 ```c#
 IotHubService.Instance.SendTelemetryAsync(new TelemetryModel());
@@ -470,3 +486,13 @@ public async Task SendTelemetryAsync(TelemetryModel data)
     }
 }
 ```
+# Conclusions
+
+In this project we have shown how reatilers can modernize their marketing channels and get closer to both existing and new customers. We have implemented a simple, yet effective, chatbot structure with conversation divided into four dialogs, each of them with a specific purpose. Several of the dialogs call external APIs - such as the QnA Maker from Microsoft Cognitive Services. We also demonstrated how to integrate the chatbot into a website and customize it to match branding. And finally, we have given administrators the ability to measure and analyse conversations using Application Insights.
+
+# Additional Resources
+
+* [MVA: Creating Bots in the Microsoft Bot Framework Using C#](https://mva.microsoft.com/en-US/training-courses/creating-bots-in-the-microsoft-bot-framework-using-c-17590?l=ALwJe9kqD_4000115881)
+* [Bot Builder GitHub](https://github.com/Microsoft/BotBuilder)
+* [Custom Events and Metrics in Application Insights](https://docs.microsoft.com/en-us/azure/application-insights/app-insights-api-custom-events-metrics)
+* [QnA Maker API](https://azure.microsoft.com/en-us/services/cognitive-services/qna-maker/?v=17.23h)
